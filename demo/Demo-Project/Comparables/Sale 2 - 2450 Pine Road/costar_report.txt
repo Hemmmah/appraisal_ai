@@ -1,0 +1,31 @@
+COSTAR COMPS - SALE DETAIL REPORT
+
+Property:       2450 Pine Road
+                Westfield, CO 80105
+County:         Demo
+
+SALE INFORMATION
+  Sale Date:    July 22, 2024
+  Sale Price:   $1,200,000
+  Buyer:        Westfield Town Center LLC
+  Seller:       Sunrise Development Corp
+  Document No.: 2024071555
+
+PROPERTY DETAILS
+  Land Area:    28,000 SF (0.64 Acres)
+  Price/SF:     $42.86
+  Zoning:       C-3
+  Parcel:       23-456-78-002
+
+SITE CHARACTERISTICS
+  Shape:        Irregular
+  Topography:   Level to gently sloping
+  Utilities:    All public
+  Flood Zone:   40% in 100-year floodplain
+
+COMMENTS
+  Large commercial parcel with partial flood zone exposure. Buyer planned mixed-use development. Arms-length transaction.
+
+VERIFICATION
+  Confirmed arms-length transaction. No unusual conditions of sale noted.
+  Price reflects land value only; no contributory improvement value.

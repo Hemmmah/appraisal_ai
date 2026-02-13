@@ -1,0 +1,30 @@
+DEMO COUNTY ASSESSOR - PROPERTY RECORD CARD
+
+Parcel Number:    12-345-67-001
+Owner:            Greenfield Holdings, LLC
+Situs Address:    1200 Maple Street
+                  Centerville, Colorado 80100
+
+LAND DATA
+  Land Area:      25,000 SF (0.57 acres)
+  Zoning:         C-2: General Commercial
+  Flood Zone:     Zone X (unshaded)
+  Land Use Code:  Commercial
+
+IMPROVEMENT DATA
+  Year Built:     1985
+  Building Type:  Single-Story Retail Building
+  Building SF:    3,200
+  Stories:        1
+  Construction:   Wood frame with stucco exterior
+  Roof:           Flat built-up
+  Condition:      Average
+
+ASSESSMENT (2025)
+  Land Value:     $375,000
+  Improvement:    $125,000
+  Total Assessed: $500,000
+
+LEGAL DESCRIPTION
+  Lot 10, Block 3, Centerville Commercial Park, County of Demo,
+  State of Colorado

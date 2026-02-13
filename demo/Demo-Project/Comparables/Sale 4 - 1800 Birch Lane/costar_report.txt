@@ -1,0 +1,31 @@
+COSTAR COMPS - SALE DETAIL REPORT
+
+Property:       1800 Birch Lane
+                Eastview, CO 80110
+County:         Demo
+
+SALE INFORMATION
+  Sale Date:    May 3, 2025
+  Sale Price:   $750,000
+  Buyer:        Birch Holdings Inc
+  Seller:       Northern Star Realty
+  Document No.: 2025050400
+
+PROPERTY DETAILS
+  Land Area:    15,000 SF (0.34 Acres)
+  Price/SF:     $50.00
+  Zoning:       C-2
+  Parcel:       34-567-89-003
+
+SITE CHARACTERISTICS
+  Shape:        Rectangular
+  Topography:   Level
+  Utilities:    All public
+  Flood Zone:   Zone X
+
+COMMENTS
+  Vacant commercial land at signalized intersection. Purchased for retail pad development. Arms-length transaction.
+
+VERIFICATION
+  Confirmed arms-length transaction. No unusual conditions of sale noted.
+  Price reflects land value only; no contributory improvement value.

@@ -1,0 +1,17 @@
+FEMA FLOOD MAP INFORMATION
+
+Community:      City of Centerville, Demo County, Colorado
+Map Panel:      08999C0150F
+Effective Date: March 15, 2020
+
+SUBJECT PROPERTY
+  Address:      1200 Maple Street, Centerville, Colorado
+  Parcel:       12-345-67-001
+  Flood Zone:   Zone X (unshaded)
+  In SFHA:      No
+
+Zone X (unshaded) — Areas determined to be outside the 0.2% annual chance
+floodplain. No mandatory flood insurance purchase requirement.
+
+The subject property is NOT located within a Special Flood Hazard Area (SFHA).
+No portion of the parcel is within Zone A, AE, AH, AO, or VE.

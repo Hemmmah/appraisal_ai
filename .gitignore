@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# Office temp files
+~$*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project outputs (drafts are generated, not tracked)
+*/Narrative/*DRAFT*
+
+# Project data files (contain client-specific info)
+data.yaml
+comp_grid.yaml
+**/comp_grid.yaml
+data.md
+**/data.md
+comp_grid.md
+**/comp_grid.md
+comp_writeups.md
+**/comp_writeups.md
+comp_writeups.yaml
+**/comp_writeups.yaml
+
+# Working state (client/proprietary data per session)
+_workstate/
+**/_workstate/
+
+# Template files (firm-specific, contain client data — local only)
+templates/**/*.docx
+templates/**/*.xlsx
+templates/**/*.yaml
+# Exception: demo-land template stays in repo (fictional data)
+!templates/demo-land/*.docx
+!templates/demo-land/*.xlsx
+!templates/demo-land/*.yaml
+
+# Reference-data for real templates (local only, contain template values)
+templates/**/reference-data.md
+# Exception: demo-land
+!templates/demo-land/reference-data.*
+
+# Development context (session-specific notes)
+.claude/CPM_SNAPSHOT.md
+
+# Private memory (may contain project details)
+.claude/projects/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

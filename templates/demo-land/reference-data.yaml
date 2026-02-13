@@ -1,0 +1,70 @@
+template_type: demo-land
+has_te: true
+fields:
+  owner_name: Greenfield Holdings, LLC
+  client_contact: Jane Appraiser
+  client_salutation: Ms. Appraiser
+  client_email: jane.appraiser@example.com
+  client_mailing_address: 1200 Maple Street
+  client_mailing_csz: Centerville, Colorado 80100
+  address_forms:
+  - 1200 Maple Street
+  city_state_zip_full: Centerville, Colorado 80100
+  city_state_zip_short: Centerville, CO 80100
+  parcel_id: 12-345-67-001
+  file_number: 2026-DEMO
+  effective_date: January 15, 2026
+  report_date: January 31, 2026
+  land_sf: 25,000
+  land_acres: '0.57'
+  building_sf: 3,200
+  building_type: single-story retail building
+  building_use: retail store
+  pe_id: PE-10
+  pe_sf: 1,500
+  te_id: TE-10
+  te_sf: '400'
+  psf_concluded_2: $50.00 PSF
+  psf_concluded_3: $50.00 per square foot
+  land_value_total: 1,250,000
+  before_take_value: 1,250,000
+  pe_value: 56,250
+  te_value: 2,000
+  just_comp_total: 56,250
+  remainder_before: 1,193,750
+  remainder_after: 1,193,750
+  pe_calculation: 1,500 SF x $50 PSF x 75%
+  pe_percentage_calc: 75%
+  te_rate: 10%
+  te_term: 12 months
+  te_term_spelled: twelve (12) months
+  zoning: 'C-2: General Commercial'
+  project_name: Maple Street Road Widening
+  project_number: RDW M100-010
+  project_code: '30100'
+  property_history: The subject property is owned by Greenfield Holdings, LLC
+  hbu_as_vacant: Retail Commercial Building
+  hbu_as_improved: Retail Commercial Building
+  traffic_count: 18,500 vehicles/day Maple St (2025)
+  frontage_line: Maple Street, Oak Avenue
+  access_line: Maple Street and Oak Avenue
+  surrounding_east: Oak Avenue / Mixed commercial
+  surrounding_west: Cedar Boulevard / Office and retail
+  title_report: The title report dated September 10, 2025, by First Demo Title Insurance Company was reviewed.
+  building_year_narrative: constructed in 1985
+  building_construction_narrative: wood frame construction with stucco exterior walls
+  building_roof_narrative: a flat built-up roof and adequate parking
+  easement_grantor: Greenfield Holdings, LLC
+  pe_percentage_context: equates to 75% of the full fee value
+  land_calc_psf: $50.00 PSF
+  comp_range: from approximately 0.24 acres to 0.64 acres
+  comp_date_range: between July 2024 and May 2025
+  comp_time_range: from approximately 8.43 months prior to the effective date of value to 17.77 months prior to the date of
+    value
+  comp_adj_psf_low: ' $       45 '
+  comp_adj_psf_high: ' $       51 '
+  comp_psf_summary: adjusted unit prices that range from $45 PSF to $51 PSF. The arithmetic average is $49 PSF. The median
+    is $50 PSF.
+  remove_sections:
+  - '2018045200'
+  - Centerville Properties LLC

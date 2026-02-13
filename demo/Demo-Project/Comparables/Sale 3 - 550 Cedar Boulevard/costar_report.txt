@@ -1,0 +1,31 @@
+COSTAR COMPS - SALE DETAIL REPORT
+
+Property:       550 Cedar Boulevard
+                Centerville, CO 80100
+County:         Demo
+
+SALE INFORMATION
+  Sale Date:    November 8, 2024
+  Sale Price:   $500,000
+  Buyer:        Centerville Retail Group
+  Seller:       Cedar Valley Trust
+  Document No.: 2024110200
+
+PROPERTY DETAILS
+  Land Area:    10,500 SF (0.24 Acres)
+  Price/SF:     $47.62
+  Zoning:       C-1
+  Parcel:       12-345-67-025
+
+SITE CHARACTERISTICS
+  Shape:        Rectangular
+  Topography:   Level
+  Utilities:    All public
+  Flood Zone:   Zone X
+
+COMMENTS
+  Small commercial lot in established retail corridor. Sold for land value. Arms-length transaction.
+
+VERIFICATION
+  Confirmed arms-length transaction. No unusual conditions of sale noted.
+  Price reflects land value only; no contributory improvement value.

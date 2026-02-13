@@ -1,0 +1,31 @@
+COSTAR COMPS - SALE DETAIL REPORT
+
+Property:       800 Oak Avenue
+                Centerville, CO 80100
+County:         Demo
+
+SALE INFORMATION
+  Sale Date:    March 15, 2025
+  Sale Price:   $600,000
+  Buyer:        Oak Street Ventures
+  Seller:       Maple Creek Partners
+  Document No.: 2025030100
+
+PROPERTY DETAILS
+  Land Area:    12,000 SF (0.28 Acres)
+  Price/SF:     $50.00
+  Zoning:       C-2
+  Parcel:       12-345-67-010
+
+SITE CHARACTERISTICS
+  Shape:        Rectangular
+  Topography:   Level
+  Utilities:    All public
+  Flood Zone:   Zone X
+
+COMMENTS
+  Vacant commercial land sold for future retail development. Arms-length transaction confirmed with buyer.
+
+VERIFICATION
+  Confirmed arms-length transaction. No unusual conditions of sale noted.
+  Price reflects land value only; no contributory improvement value.

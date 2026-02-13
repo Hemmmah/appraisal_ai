@@ -1,0 +1,35 @@
+CITY OF CENTERVILLE ZONING INFORMATION
+
+Property:       1200 Maple Street
+Parcel:         12-345-67-001
+Current Zoning: C-2: General Commercial
+
+C-2: GENERAL COMMERCIAL DISTRICT
+
+PURPOSE
+  The C-2 district is intended to provide areas for a wide range of commercial
+  uses including retail, office, service, and limited mixed-use development.
+
+PERMITTED USES
+  - Retail stores and shops
+  - Restaurants and food service
+  - Professional and business offices
+  - Personal service establishments
+  - Financial institutions
+  - Medical and dental offices
+  - Hotels and motels (conditional use)
+
+DEVELOPMENT STANDARDS
+  Minimum Lot Size:     5,000 SF
+  Minimum Lot Width:    50 feet
+  Maximum Building Height: 45 feet (3 stories)
+  Maximum Lot Coverage: 75%
+  Front Setback:        10 feet
+  Side Setback:         0 feet (5 feet adjacent to residential)
+  Rear Setback:         10 feet
+  Parking:              Per use requirements
+
+NOTES
+  The subject property's 25,000 SF (0.57 acres) exceeds the
+  minimum lot size of 5,000 SF. The existing single-story retail building is a
+  conforming use under C-2 zoning.
