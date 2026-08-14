@@ -326,3 +326,21 @@ appraisal_ai/
 ├── .gitignore
 └── README.md
 ```
+
+---
+
+## License
+
+**PolyForm Small Business License 1.0.0** — see [LICENSE](LICENSE).
+
+Plain English:
+
+- **Individual appraisers and small firms** (fewer than 100 people AND under $1M USD
+  annual revenue, inflation-adjusted) may use, modify, and share this tool freely —
+  including in their own commercial appraisal practice.
+- **Larger commercial entities** are not licensed under these terms. For commercial
+  licensing, contact the author.
+
+This is a "source-available" license, not an OSI-approved open-source license — the
+trade-off is deliberate: the tool stays free for the appraisers it was built for,
+without granting rights to larger commercial operations.
