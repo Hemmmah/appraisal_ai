@@ -16,6 +16,16 @@ Reads the project's `data.md` and a master template, then produces a Word docume
 
 No build script — Claude reads the template structure, builds replacements, and writes the docx directly using utility functions from `scripts/utils.py`.
 
+## Anchor mode: check this first
+
+This skill matches **literal old-text strings** from `reference-data.md` and
+replaces them — the right choice for prose-heavy narratives. If the pack
+instead ships `templates/<template-type>/reference-data.json` with
+`anchor_mode: highlight` (position + yellow-highlight anchoring — used for
+dense tabular templates, e.g. Arabic صك/مخطط/حدود packs, where identical
+literal values like "-"/"20" map to different fields), **use
+`.claude/skills/draft-highlight.md` instead of the steps below.**
+
 ## Steps
 
 ### 1. Verify inputs

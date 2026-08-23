@@ -368,6 +368,32 @@ Running log of mistakes and the rules they produced. Read this on every session 
 **What happened:** Suggested adjustment amounts and whether to include/exclude comps. These are professional opinions, not data extraction.
 **Rule added:** "Report truths, don't make appraiser judgments." Flag factual issues but leave professional opinion to the appraiser. (CLAUDE.md General Rules)
 
+### 2026-08-23 — Added highlight-anchor mode for Arabic/RTL packs
+**What happened:** The existing draft engine (`draft.md`) matches literal old-text
+strings from `reference-data.md`. This breaks for dense Arabic tabular templates
+(صك/مخطط/حدود) where short repeated literals ("-", "20", "1000") map to different
+fields depending on position, and where bidi rendering in Word fragments runs more
+aggressively than plain English — making literal-text matching fragile.
+**Rule added:** New anchor mode, `anchor_mode: highlight` in `reference-data.json`
+— fields are located by table/row/cell position + presence of a yellow-highlighted
+run, never by text match. Engine lives in `scripts/utils.py`
+(`load_tables_dfs`, `cell_at`, `highlighted_runs`, `tracked_replace_highlighted`,
+`fill_highlighted_template`, `resolve_anchor_values`, `gregorian_to_hijri`).
+Orchestration in `.claude/skills/draft-highlight.md`; `draft.md`/`run.md` now check
+for `reference-data.json` first and route there. Worked example + regenerable
+test in `templates/demo-ksa/` + `demo/setup_demo_ksa.py` + `demo/run_demo_ksa.py`.
+**Bug found and fixed while verifying:** `derive_hijri_from` (and `default_from`)
+must resolve against already-resolved values first, then fall back to raw project
+data — otherwise a chain like `issue_date_h ← issue_date_g ← default_from
+valuation_date_g` (where `issue_date_g` never appears literally in `data.md`)
+silently fails to derive. Caught by running the demo end-to-end and diffing the
+expected vs. actual filled-field count, not by inspection.
+**Verification note:** LibreOffice headless (`soffice --convert-to pdf`) failed to
+convert ANY docx in this sandbox, including pre-existing known-good files — an
+environment limitation, not a file defect (confirmed via python-docx +
+well-formed-XML checks + text-extraction spot checks + tracked-change element
+counts instead). Open the actual output in Word for a final visual RTL check.
+
 ### 2026-01-31 — Defaulted to CoStar for grantor/grantee instead of reading deeds first
 **What happened:** Used CoStar buyer/seller as the primary source for grantor/grantee, then said "verify against deed." The appraiser expects us to read the deed first (authoritative source), cross-check against CoStar, and report discrepancies — saving them that manual step.
 **Rule added:** Deed-first workflow: (1) Read deed, extract grantor/grantee. (2) Read CoStar buyer/seller. (3) Cross-check and report mismatches in notes. (4) Use deed values in output. Only fall back to CoStar if no deed available. Updated comp-reader.md and comp-writer.md.

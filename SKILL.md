@@ -85,9 +85,18 @@ Each pack in `templates/<name>/` contains:
 
 - `narrative.docx` — master template (user-provided, not in git)
 - `grid.xlsx` — adjustment grid template (optional, user-provided)
-- `reference-data.md` — every replaceable text string extracted from the template
+- `reference-data.md` — every replaceable text string extracted from the template (literal-text anchor mode)
 
 Custom packs follow the same structure. The user supplies their own completed appraisal as the master template.
+
+**Two anchor modes.** Literal-text matching (`reference-data.md`, default —
+`.claude/skills/draft.md`) works for prose narratives. Dense tabular templates
+where identical literals ("-", "20") mean different things by position — the
+common case for Arabic/RTL packs (صك/مخطط/حدود أربعة/تواريخ هجرية) — should use
+highlight-anchor matching instead: `reference-data.json` with
+`"anchor_mode": "highlight"`, position + yellow-highlight only, never text
+match. See `.claude/skills/draft-highlight.md` and the worked example in
+`templates/demo-ksa/`.
 
 ## Key Utilities (`scripts/utils.py`)
 

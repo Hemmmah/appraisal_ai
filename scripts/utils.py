@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import tempfile
+import zipfile
 from lxml import etree
 
 
@@ -945,3 +946,330 @@ def insert_paragraphs_after(body, anchor_para, new_paragraphs):
         anchor_para.addnext(para)
         anchor_para = para
     return len(new_paragraphs)
+
+
+# ── Highlight-anchor replacement engine (Arabic / position-anchored packs) ──
+#
+# Some templates (e.g. dense Arabic tables with repeated literal values like
+# "-", "20", "1000") cannot be safely matched by the literal-text diff engine
+# above, because identical old-text strings map to different semantic fields.
+# For these packs, `reference-data.yaml` sets `anchor_mode: highlight` and
+# each field carries `anchors: [{t, r, c}, ...]` — 1-based table/row/cell
+# coordinates, numbered by document order (DFS into nested tables) — instead
+# of (or in addition to) a literal old value. Replacement targets the
+# highlighted run(s) at that position, never a text match.
+
+def load_tables_dfs(body):
+    """
+    Return all <w:tbl> elements in document order, including tables nested
+    inside table cells (depth-first), matching how a human numbers "table 1,
+    table 2..." while reading top to bottom. Anchor coordinates in
+    reference-data.yaml are 1-based indices into this list.
+    """
+    tables = []
+
+    def walk(el):
+        for c in el:
+            ln = etree.QName(c).localname
+            if ln == 'tbl':
+                tables.append(c)
+                for row in (r for r in c if etree.QName(r).localname == 'tr'):
+                    for cell in (tc for tc in row if etree.QName(tc).localname == 'tc'):
+                        walk(cell)
+
+    walk(body)
+    return tables
+
+
+def cell_at(tables, t, r, c):
+    """Return the <w:tc> at 1-based (table, row, cell) coordinates, or None."""
+    if t < 1 or t > len(tables):
+        return None
+    rows = [x for x in tables[t - 1] if etree.QName(x).localname == 'tr']
+    if r < 1 or r > len(rows):
+        return None
+    cells = [x for x in rows[r - 1] if etree.QName(x).localname == 'tc']
+    if c < 1 or c > len(cells):
+        return None
+    return cells[c - 1]
+
+
+def is_highlighted(run):
+    """True if a <w:r> has a non-'none' <w:highlight> in its run properties."""
+    rpr = run.find(f'{W}rPr')
+    if rpr is None:
+        return False
+    h = rpr.find(f'{W}highlight')
+    return h is not None and h.get(f'{W}val', 'none') != 'none'
+
+
+def highlighted_runs(container):
+    """All highlighted <w:r> descendants of a container (cell, paragraph, ...)."""
+    return [r for r in container.iter(f'{W}r') if is_highlighted(r)]
+
+
+def set_runs_text(runs, new_text, remove_highlight=True):
+    """
+    Direct-replacement mode: write new_text into the first run (preserving
+    its formatting), blank out any remaining runs at that anchor, and
+    optionally strip the highlight so filled fields render as normal text.
+    """
+    if not runs:
+        return
+    first = runs[0]
+    for t in first.findall(f'{W}t'):
+        first.remove(t)
+    t = etree.SubElement(first, f'{W}t')
+    t.text = new_text
+    t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    for r in runs[1:]:
+        for tt in r.findall(f'{W}t'):
+            r.remove(tt)
+    if remove_highlight:
+        for r in runs:
+            rpr = r.find(f'{W}rPr')
+            if rpr is not None:
+                for h in rpr.findall(f'{W}highlight'):
+                    rpr.remove(h)
+
+
+def tracked_replace_highlighted(runs, new_text, author=None, date_str=None):
+    """
+    Tracked-changes mode for highlight-anchored fields: wraps the old
+    highlighted run(s) in <w:del> (as <w:delText>, highlight preserved so a
+    rejected change reverts to the original template state) and inserts
+    new_text in a fresh <w:ins> run cloned from the first run's formatting
+    with the highlight stripped (so an accepted change looks like a normal
+    filled value). Mirrors make_tracked_delete()/make_tracked_insert() above
+    but keyed by position instead of by text match.
+    """
+    if not runs:
+        return
+    author = author or get_author()
+    date_str = date_str or get_date()
+    parent = runs[0].getparent()
+    first_idx = list(parent).index(runs[0])
+
+    del_elements = []
+    for r in runs:
+        parent.remove(r)
+        for t_el in r.findall(f'{W}t'):
+            t_el.tag = f'{W}delText'
+            t_el.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+        del_el = etree.Element(f'{W}del')
+        del_el.set(f'{W}id', next_change_id())
+        del_el.set(f'{W}author', author)
+        del_el.set(f'{W}date', date_str)
+        del_el.append(r)
+        del_elements.append(del_el)
+
+    ins_el = etree.Element(f'{W}ins')
+    ins_el.set(f'{W}id', next_change_id())
+    ins_el.set(f'{W}author', author)
+    ins_el.set(f'{W}date', date_str)
+    new_run = etree.SubElement(ins_el, f'{W}r')
+    rpr_src = del_elements[0][0].find(f'{W}rPr')
+    if rpr_src is not None:
+        new_rpr = copy.deepcopy(rpr_src)
+        for h in new_rpr.findall(f'{W}highlight'):
+            new_rpr.remove(h)
+        new_run.append(new_rpr)
+    t = etree.SubElement(new_run, f'{W}t')
+    t.text = new_text
+    t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+
+    for i, del_el in enumerate(del_elements):
+        parent.insert(first_idx + i, del_el)
+    parent.insert(first_idx + len(del_elements), ins_el)
+
+
+def fmt_number(v, style='comma'):
+    """Format a numeric field per reference-data.yaml's number_format meta."""
+    try:
+        f = float(str(v).replace(',', ''))
+        if style == 'plain':
+            return str(int(f)) if f == int(f) else str(f)
+        if style == 'comma2':
+            return f'{f:,.2f}'
+        return f'{f:,.0f}' if f == int(f) else f'{f:,.2f}'
+    except (ValueError, TypeError):
+        return str(v)
+
+
+def gregorian_to_hijri(greg_str):
+    """
+    Convert a 'YYYY-MM-DD' Gregorian date string to 'YYYY-MM-DD' Hijri
+    (Umm al-Qura, via the `hijridate` package). Returns None if the string
+    can't be parsed or the package isn't installed — callers should fall
+    back to asking the appraiser for the Hijri date rather than guessing.
+    Derived Hijri dates must always be confirmed by the appraiser: Umm
+    al-Qura sighting-based edge cases (±1 day near month boundaries) exist.
+    """
+    try:
+        from hijridate import Gregorian
+        y, m, d = [int(x) for x in re.split(r'[-/]', str(greg_str).strip())]
+        h = Gregorian(y, m, d).to_hijri()
+        return f'{h.year}-{h.month:02d}-{h.day:02d}'
+    except Exception:
+        return None
+
+
+HIJRI_MONTHS_AR = [
+    'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة',
+    'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة',
+]
+
+
+def format_hijri_arabic(hijri_str):
+    """'1447-02-05' -> '٥ صفر ١٤٤٧هـ' style Arabic-Indic formatted string."""
+    try:
+        y, m, d = [int(x) for x in re.split(r'[-/]', str(hijri_str).strip())]
+        arabic_indic = str.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩')
+        day = str(d).translate(arabic_indic)
+        year = str(y).translate(arabic_indic)
+        month = HIJRI_MONTHS_AR[m - 1]
+        return f'{day} {month} {year}هـ'
+    except Exception:
+        return str(hijri_str)
+
+
+def resolve_anchor_values(fields, data, warnings):
+    """
+    Resolve final field values for a highlight-anchored pack: explicit
+    project value > derived (e.g. Hijri from Gregorian) > default_from a
+    sibling field > static default. Never blocks on missing optional data;
+    appends human-readable notes to `warnings` for anything auto-derived or
+    unresolved so it can be surfaced to the appraiser for confirmation.
+    """
+    vals = {}
+    for key, spec in fields.items():
+        if key in data and data[key] not in (None, ''):
+            vals[key] = str(data[key])
+            continue
+        if spec.get('derive_hijri_from'):
+            src_key = spec['derive_hijri_from']
+            # Look up the already-resolved value first (handles chains like
+            # issue_date_h <- issue_date_g <- default_from valuation_date_g,
+            # where issue_date_g never appears literally in the raw data),
+            # falling back to the raw project data.
+            src = vals.get(src_key, data.get(src_key))
+            if src and str(src) != '-':
+                h = gregorian_to_hijri(src)
+                if h:
+                    vals[key] = h
+                    warnings.append(f"↷ {key}: تاريخ هجري مُشتق تلقائيًا من {spec['derive_hijri_from']} ({src}) — يُرجى تأكيده")
+                    continue
+                warnings.append(f"⚠ {key}: تعذر اشتقاق الهجري تلقائيًا (تحقق من تثبيت مكتبة hijridate) — أدخله يدويًا")
+        if spec.get('default_from') and spec['default_from'] in vals:
+            vals[key] = vals[spec['default_from']]
+            continue
+        if spec.get('default_from') and spec['default_from'] in data:
+            vals[key] = str(data[spec['default_from']])
+            continue
+        if 'default' in spec:
+            vals[key] = spec['default']
+            continue
+    for key, spec in fields.items():
+        if spec.get('type') == 'derived' and key not in vals and spec.get('formula'):
+            try:
+                vals[key] = spec['formula'].format(**vals)
+            except KeyError as e:
+                warnings.append(f'⚠ {key}: مكوّن ناقص لتركيب الحقل ({e})')
+    return vals
+
+
+def fill_highlighted_template(template_path, output_path, fields, data,
+                               mode='track_changes', author=None, strict=False,
+                               number_format='comma', keep_highlight=False):
+    """
+    High-level orchestrator for a highlight-anchored pack: copies nothing
+    itself (caller should already have copied template_path -> output_path,
+    or pass the same path to edit a working copy in place), loads
+    word/document.xml, walks every field's anchors, and applies either
+    direct replacement or tracked-changes replacement at each highlighted
+    position. Returns a report dict: {filled, skipped, missing, warnings}.
+
+    Args:
+        template_path: docx to read (usually == output_path, a working copy)
+        output_path: where to write the result
+        fields: the `fields` dict from reference-data.yaml (see fields.json
+                 shape in .claude/skills/draft-highlight.md for the anchor
+                 spec: label, type, anchors=[{t,r,c}, ...], optional
+                 default/default_from/derive_hijri_from/formula)
+        data: project field values (e.g. proj_fields from data.md)
+        mode: 'track_changes' (default, reviewable) or 'direct' (overwrite)
+        author: reviewer name for tracked changes (defaults to get_author())
+        strict: raise if any anchor is missing instead of warning
+        keep_highlight: direct mode only — keep highlight on filled fields
+    """
+    warnings = []
+    vals = resolve_anchor_values(fields, data, warnings)
+
+    with zipfile.ZipFile(template_path, 'r') as z:
+        xml_bytes = z.read('word/document.xml')
+    tree = etree.fromstring(xml_bytes).getroottree()
+    body = tree.getroot().find(f'{W}body')
+    tables = load_tables_dfs(body)
+
+    filled, skipped, missing = [], [], []
+    date_str = get_date()
+    author = author or get_author()
+
+    for key, spec in fields.items():
+        if key not in vals:
+            if not spec.get('optional'):
+                skipped.append(f"{key} ({spec.get('label', key)})")
+            continue
+        raw = vals[key]
+        v = fmt_number(raw, number_format) if spec.get('type') == 'number' else raw
+        for a in spec.get('anchors', []):
+            if a.get('scope') == 'letter':
+                target = None
+                for p in body:
+                    if etree.QName(p).localname != 'p':
+                        continue
+                    txt = ''.join(t.text or '' for t in p.iter(f'{W}t'))
+                    if a.get('context', '') in txt and highlighted_runs(p):
+                        target = p
+                        break
+                container = target
+                loc = f"letter({a.get('context', '')})"
+            else:
+                container = cell_at(tables, a['t'], a['r'], a['c'])
+                loc = f"table{a.get('t')}/row{a.get('r')}/cell{a.get('c')}"
+            if container is None:
+                missing.append(f'{key} @ {loc} — position not found')
+                continue
+            runs = highlighted_runs(container)
+            if not runs:
+                missing.append(f'{key} @ {loc} — no highlighted run at position')
+                continue
+            rendered = a['render'].replace('{v}', v) if a.get('render') else v
+            if mode == 'track_changes':
+                tracked_replace_highlighted(runs, rendered, author=author, date_str=date_str)
+            else:
+                set_runs_text(runs, rendered, remove_highlight=not keep_highlight)
+            filled.append(f'{key} @ {loc} <- "{rendered}"')
+
+    if missing and strict:
+        raise ValueError('Strict mode: missing anchors:\n' + '\n'.join(missing))
+
+    new_xml = etree.tostring(tree, xml_declaration=True, encoding='UTF-8', standalone=True)
+    new_xml = new_xml.replace(
+        b"<?xml version='1.0' encoding='UTF-8' standalone='yes'?>",
+        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    )
+
+    temp_dir = tempfile.mkdtemp()
+    temp_docx = os.path.join(temp_dir, 'temp.docx')
+    with zipfile.ZipFile(template_path, 'r') as zin:
+        with zipfile.ZipFile(temp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
+            for item in zin.infolist():
+                if item.filename == 'word/document.xml':
+                    zout.writestr(item, new_xml)
+                else:
+                    zout.writestr(item, zin.read(item.filename))
+    shutil.move(temp_docx, output_path)
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+    return {'filled': filled, 'skipped': skipped, 'missing': missing, 'warnings': warnings}

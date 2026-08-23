@@ -97,7 +97,9 @@ Launch both agents simultaneously:
 
 1. **Draft Builder** — builds the narrative docx directly using lxml and utility functions
    - Agent spec: `.claude/agents/draft-builder.md`
-   - Prompt: `"Build the narrative draft for '<project-path>' using template type '<template-type>'. Follow the instructions in .claude/skills/draft.md to copy the template, load data.md and reference-data.md, and apply tracked-change replacements directly using inline Python and utility functions from scripts/utils.py. See .claude/agents/draft-builder.md for full instructions."`
+   - If `~/appraisal_ai/templates/<template-type>/reference-data.json` exists (anchor_mode: highlight), follow `.claude/skills/draft-highlight.md` instead — position/highlight-anchored replacement (e.g. Arabic deed/plan/boundary packs), not literal-text matching.
+   - Prompt (literal-text packs): `"Build the narrative draft for '<project-path>' using template type '<template-type>'. Follow the instructions in .claude/skills/draft.md to copy the template, load data.md and reference-data.md, and apply tracked-change replacements directly using inline Python and utility functions from scripts/utils.py. See .claude/agents/draft-builder.md for full instructions."`
+   - Prompt (highlight-anchor packs): `"Build the narrative draft for '<project-path>' using template type '<template-type>'. Follow .claude/skills/draft-highlight.md — copy the template, load data.md and reference-data.json, and call fill_highlighted_template() from scripts/utils.py. Ask the user whether they want track_changes or direct mode before writing the final output."`
 
 2. **Grid Builder** — fills the adjustment grid directly using openpyxl
    - Agent spec: `.claude/agents/grid-builder.md`
