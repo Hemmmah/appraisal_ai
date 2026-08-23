@@ -1,0 +1,401 @@
+{
+  "_meta": {
+    "template_name": "narrative.docx",
+    "template_type": "demo-ksa",
+    "anchor_mode": "highlight",
+    "description": "حزمة تجريبية عربية بمرساة التظليل — يُعبَّى بالتظليل الأصفر وليس بمطابقة النص",
+    "number_format": "comma",
+    "scope": "البيانات الأساسية للعقار فقط (صك/مخطط/حدود/تواريخ) — القيم النهائية والمقارنات خارج النطاق"
+  },
+  "fields": {
+    "deed_number": {
+      "label": "رقم الصك",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 1
+        }
+      ]
+    },
+    "deed_date_h": {
+      "label": "تاريخ الصك (هجري)",
+      "type": "date_h",
+      "required": true,
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "land_area_deed": {
+      "label": "المساحة حسب الصك (م2)",
+      "type": "number",
+      "required": true,
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 3
+        },
+        {
+          "t": 6,
+          "r": 2,
+          "c": 1
+        }
+      ]
+    },
+    "plan_number": {
+      "label": "رقم المخطط",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 4
+        }
+      ]
+    },
+    "block_number": {
+      "label": "رقم البلك",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 5
+        }
+      ]
+    },
+    "parcel_number": {
+      "label": "رقم قطعة الأرض",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 1,
+          "r": 2,
+          "c": 6
+        }
+      ]
+    },
+    "client_name": {
+      "label": "اسم العميل / طالب التقييم",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 2,
+          "r": 2,
+          "c": 1
+        }
+      ]
+    },
+    "owner_name": {
+      "label": "اسم المالك",
+      "type": "text",
+      "default_from": "client_name",
+      "anchors": [
+        {
+          "t": 2,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "valuation_purpose": {
+      "label": "الغرض من التقييم",
+      "type": "text",
+      "default": "للأغراض المحاسبية",
+      "anchors": [
+        {
+          "t": 2,
+          "r": 2,
+          "c": 3
+        }
+      ]
+    },
+    "document_type": {
+      "label": "نوع مستند الملكية",
+      "type": "text",
+      "default": "صك إلكتروني",
+      "anchors": [
+        {
+          "t": 2,
+          "r": 2,
+          "c": 4
+        }
+      ]
+    },
+    "city": {
+      "label": "المدينة",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 3,
+          "r": 2,
+          "c": 1
+        }
+      ]
+    },
+    "district": {
+      "label": "الحي",
+      "type": "text",
+      "required": true,
+      "anchors": [
+        {
+          "t": 3,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "longitude": {
+      "label": "خط الطول",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 3,
+          "r": 2,
+          "c": 3
+        }
+      ]
+    },
+    "latitude": {
+      "label": "خط العرض",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 3,
+          "r": 2,
+          "c": 4
+        }
+      ]
+    },
+    "boundary_north": {
+      "label": "الحد الشمالي",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "boundary_north_len": {
+      "label": "طول الحد الشمالي (م)",
+      "type": "number",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 2,
+          "c": 3
+        }
+      ]
+    },
+    "boundary_south": {
+      "label": "الحد الجنوبي",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 3,
+          "c": 2
+        }
+      ]
+    },
+    "boundary_south_len": {
+      "label": "طول الحد الجنوبي (م)",
+      "type": "number",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 3,
+          "c": 3
+        }
+      ]
+    },
+    "boundary_east": {
+      "label": "الحد الشرقي",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 4,
+          "c": 2
+        }
+      ]
+    },
+    "boundary_east_len": {
+      "label": "طول الحد الشرقي (م)",
+      "type": "number",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 4,
+          "c": 3
+        }
+      ]
+    },
+    "boundary_west": {
+      "label": "الحد الغربي",
+      "type": "text",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 5,
+          "c": 2
+        }
+      ]
+    },
+    "boundary_west_len": {
+      "label": "طول الحد الغربي (م)",
+      "type": "number",
+      "anchors": [
+        {
+          "t": 4,
+          "r": 5,
+          "c": 3
+        }
+      ]
+    },
+    "inspection_date_g": {
+      "label": "تاريخ معاينة الموقع (ميلادي)",
+      "type": "date_g",
+      "required": true,
+      "anchors": [
+        {
+          "t": 5,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "inspection_date_h": {
+      "label": "تاريخ معاينة الموقع (هجري)",
+      "type": "date_h",
+      "derive_hijri_from": "inspection_date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 2,
+          "c": 3
+        }
+      ]
+    },
+    "engagement_date_g": {
+      "label": "تاريخ التكليف (ميلادي)",
+      "type": "date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 3,
+          "c": 2
+        }
+      ]
+    },
+    "engagement_date_h": {
+      "label": "تاريخ التكليف (هجري)",
+      "type": "date_h",
+      "derive_hijri_from": "engagement_date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 3,
+          "c": 3
+        }
+      ]
+    },
+    "valuation_date_g": {
+      "label": "تاريخ قياس القيمة (ميلادي)",
+      "type": "date_g",
+      "required": true,
+      "anchors": [
+        {
+          "t": 5,
+          "r": 4,
+          "c": 2
+        }
+      ]
+    },
+    "valuation_date_h": {
+      "label": "تاريخ قياس القيمة (هجري)",
+      "type": "date_h",
+      "derive_hijri_from": "valuation_date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 4,
+          "c": 3
+        }
+      ]
+    },
+    "issue_date_g": {
+      "label": "تاريخ إصدار التقرير (ميلادي)",
+      "type": "date_g",
+      "default_from": "valuation_date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 5,
+          "c": 2
+        }
+      ]
+    },
+    "issue_date_h": {
+      "label": "تاريخ إصدار التقرير (هجري)",
+      "type": "date_h",
+      "derive_hijri_from": "issue_date_g",
+      "anchors": [
+        {
+          "t": 5,
+          "r": 5,
+          "c": 3
+        }
+      ]
+    },
+    "land_area_actual": {
+      "label": "المساحة حسب الطبيعة (م2)",
+      "type": "number",
+      "default_from": "land_area_deed",
+      "anchors": [
+        {
+          "t": 6,
+          "r": 2,
+          "c": 2
+        }
+      ]
+    },
+    "land_area_adopted": {
+      "label": "المساحة المعتمدة في التقييم (م2)",
+      "type": "number",
+      "default_from": "land_area_deed",
+      "anchors": [
+        {
+          "t": 6,
+          "r": 2,
+          "c": 3
+        }
+      ]
+    },
+    "built_area": {
+      "label": "مسطحات البناء التقريبية (م2)",
+      "type": "number",
+      "optional": true,
+      "anchors": [
+        {
+          "t": 6,
+          "r": 2,
+          "c": 4
+        }
+      ]
+    }
+  }
+}
