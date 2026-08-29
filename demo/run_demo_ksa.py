@@ -56,7 +56,7 @@ def run_mode(mode, out_name):
     return working_copy, report
 
 
-def verify(path, mode):
+def verify(path, mode, ref_fields, proj_fields, derived_or_defaulted):
     # 1. Valid zip + well-formed document.xml
     with zipfile.ZipFile(path) as z:
         xml_bytes = z.read('word/document.xml')
@@ -77,8 +77,23 @@ def verify(path, mode):
         status = 'OK' if c in text else 'MISSING'
         print(f"  [{status}] expected value present: {c!r}")
 
+    # Optional empty fields (e.g. built_area on a land-only demo) leave their
+    # yellow "---" placeholders in place by design — count only unexpected leftovers.
+    optional_empty = 0
+    for key, spec in ref_fields.items():
+        if not spec.get('optional'):
+            continue
+        val = proj_fields.get(key)
+        if val in (None, ''):
+            optional_empty += len(spec.get('anchors', []))
     placeholder_count = text.count('---')
-    print(f"  placeholder '---' occurrences remaining in text: {placeholder_count}")
+    unexpected = placeholder_count - optional_empty
+    print(f"  placeholder '---' remaining: {placeholder_count} "
+          f"(optional-empty expected: {optional_empty}, unexpected: {unexpected})")
+    if unexpected > 0:
+        print(f"  [WARN] {unexpected} unexpected placeholder(s) still in the draft")
+    else:
+        print("  [OK] no unexpected placeholders (optional empty fields may keep ---)")
 
     if mode == 'track_changes':
         w = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -89,13 +104,33 @@ def verify(path, mode):
         # spot check: old placeholder text should still be present as delText (reviewable)
         del_texts = [e.text for e in tree.findall(f'.//{w}delText')]
         print(f"  sample delText values: {del_texts[:3]}")
+        expected_fills = sum(
+            len(spec.get('anchors', []))
+            for key, spec in ref_fields.items()
+            if proj_fields.get(key) not in (None, '') or key in derived_or_defaulted
+        )
+        if n_del == n_ins == expected_fills:
+            print(f"  [OK] tracked-change count matches filled anchors ({expected_fills})")
+        else:
+            print(f"  [WARN] tracked-change count {n_del}/{n_ins} vs expected fills {expected_fills}")
 
 
 if __name__ == '__main__':
+    ref = json.load(open(os.path.join(TEMPLATE_DIR, 'reference-data.json'), encoding='utf-8'))
+    project = load_md(os.path.join(DEMO_DIR, 'data.md'))
+    proj_fields = project.get('fields', project)
+    ref_fields = ref['fields']
+
+    # Keys that resolve without an explicit data.md value (defaults / Hijri derive).
+    from utils import resolve_anchor_values
+    _warnings = []
+    resolved = resolve_anchor_values(ref_fields, proj_fields, _warnings)
+    derived_or_defaulted = {k for k in resolved if proj_fields.get(k) in (None, '')}
+
     path_direct, _ = run_mode('direct', 'KSA-DEMO Narrative DRAFT (direct).docx')
     path_track, _ = run_mode('track_changes', 'KSA-DEMO Narrative DRAFT (tracked).docx')
 
     print('\n--- Verification ---')
-    verify(path_direct, 'direct')
+    verify(path_direct, 'direct', ref_fields, proj_fields, derived_or_defaulted)
     print()
-    verify(path_track, 'track_changes')
+    verify(path_track, 'track_changes', ref_fields, proj_fields, derived_or_defaulted)

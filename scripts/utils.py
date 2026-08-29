@@ -962,9 +962,9 @@ def insert_paragraphs_after(body, anchor_para, new_paragraphs):
 def load_tables_dfs(body):
     """
     Return all <w:tbl> elements in document order, including tables nested
-    inside table cells (depth-first), matching how a human numbers "table 1,
+    inside table cells (depth-first),     matching how a human numbers "table 1,
     table 2..." while reading top to bottom. Anchor coordinates in
-    reference-data.yaml are 1-based indices into this list.
+    reference-data.json are 1-based indices into this list.
     """
     tables = []
 
@@ -1084,7 +1084,7 @@ def tracked_replace_highlighted(runs, new_text, author=None, date_str=None):
 
 
 def fmt_number(v, style='comma'):
-    """Format a numeric field per reference-data.yaml's number_format meta."""
+    """Format a numeric field per reference-data.json's number_format meta."""
     try:
         f = float(str(v).replace(',', ''))
         if style == 'plain':
@@ -1192,9 +1192,9 @@ def fill_highlighted_template(template_path, output_path, fields, data,
     Args:
         template_path: docx to read (usually == output_path, a working copy)
         output_path: where to write the result
-        fields: the `fields` dict from reference-data.yaml (see fields.json
-                 shape in .claude/skills/draft-highlight.md for the anchor
-                 spec: label, type, anchors=[{t,r,c}, ...], optional
+        fields: the `fields` dict from reference-data.json (see
+                 .claude/skills/draft-highlight.md for the anchor spec:
+                 label, type, anchors=[{t,r,c}, ...], optional
                  default/default_from/derive_hijri_from/formula)
         data: project field values (e.g. proj_fields from data.md)
         mode: 'track_changes' (default, reviewable) or 'direct' (overwrite)
