@@ -146,6 +146,31 @@ A template pack is a folder under `templates/<pack-name>/` containing:
 - **`reference-data.md`** — every replaceable value extracted from the template (keyed by field name)
 - **`rules.md`** (optional) — pack-specific rules (conditional sections, removals, calculations)
 
+### Anchor modes: literal-text vs. highlight
+
+There are two ways a pack tells the build engine where to substitute values —
+pick per pack, based on how "unique" the template's literal text is:
+
+1. **Literal-text matching** (`reference-data.md`) — the default, described
+   above. Works well for prose-heavy narratives where old values are unique
+   strings. See `.claude/skills/draft.md`.
+2. **Highlight-anchor matching** (`reference-data.json` with
+   `"anchor_mode": "highlight"`) — for dense tabular templates where
+   identical literal values ("-", "20", "1000") appear in many places and
+   mean different things depending on position. Fields are located by
+   **table/row/cell position + a yellow-highlighted run**, never by text
+   match. This is the recommended mode for Arabic/RTL templates (صك، رقم
+   مخطط، حدود أربعة، تواريخ هجرية...), since bidi text rendering in Word
+   fragments runs more aggressively than plain English, making literal-text
+   matching fragile. See `.claude/skills/draft-highlight.md` and the
+   worked example in `templates/demo-ksa/` (built + verified end-to-end via
+   `demo/setup_demo_ksa.py` + `demo/run_demo_ksa.py`).
+
+Both modes produce the same output contract: a Word draft with `w:del`/`w:ins`
+tracked changes the appraiser reviews field by field (highlight-anchor packs
+can also produce a clean "direct" output once the field map is trusted — see
+`draft-highlight.md`).
+
 ### Examples of Packs (customize to your setup)
 
 - `res-1004` — URAR narrative + adjustment grid

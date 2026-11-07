@@ -18,7 +18,8 @@ Thumbs.db
 desktop.ini
 
 # Project outputs (drafts are generated, not tracked)
-*/Narrative/*DRAFT*
+# (** so this matches regardless of nesting depth, e.g. demo/<project>/Narrative/...)
+**/Narrative/*DRAFT*
 
 # Project data files (contain client-specific info)
 data.yaml
@@ -41,15 +42,19 @@ _workstate/
 templates/**/*.docx
 templates/**/*.xlsx
 templates/**/*.yaml
-# Exception: demo-land template stays in repo (fictional data)
+# Exception: demo-land / demo-ksa templates stay in repo (fictional data)
 !templates/demo-land/*.docx
 !templates/demo-land/*.xlsx
 !templates/demo-land/*.yaml
+!templates/demo-ksa/*.docx
+!templates/demo-ksa/*.xlsx
 
 # Reference-data for real templates (local only, contain template values)
 templates/**/reference-data.md
-# Exception: demo-land
+templates/**/reference-data.json
+# Exception: demo-land / demo-ksa
 !templates/demo-land/reference-data.*
+!templates/demo-ksa/reference-data.*
 
 # Development context (session-specific notes)
 .claude/CPM_SNAPSHOT.md
