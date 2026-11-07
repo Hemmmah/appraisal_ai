@@ -95,8 +95,39 @@ def verify(path, mode, ref_fields, proj_fields, derived_or_defaulted):
     else:
         print("  [OK] no unexpected placeholders (optional empty fields may keep ---)")
 
+    # 4. RTL / bidi structure must survive fill (Word visual check still recommended)
+    w = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+    n_bidi = len(tree.findall(f'.//{w}bidi'))
+    n_rtl = len(tree.findall(f'.//{w}rtl'))
+    n_bidi_visual = len(tree.findall(f'.//{w}bidiVisual'))
+    print(f"  RTL markup: <w:bidi>={n_bidi}, <w:rtl>={n_rtl}, <w:bidiVisual>={n_bidi_visual}")
+    if n_bidi > 0 and n_rtl > 0:
+        print("  [OK] RTL paragraph + run direction markers present after fill")
+    else:
+        print("  [WARN] RTL markers missing or stripped — open in Word and check direction")
+
+    # 5. Hijri Arabic-Indic month names should appear for date_h fields
+    hijri_markers = ['هـ', 'رجب', 'محرم', 'صفر', 'رمضان', 'شوال']
+    found_hijri = [m for m in hijri_markers if m in text]
+    if found_hijri:
+        print(f"  [OK] Hijri Arabic rendering present: {found_hijri}")
+    else:
+        print("  [WARN] no Arabic Hijri markers found in draft text")
+
+    # 6. Filled insertion runs should not retain yellow highlight
+    #    (placeholders that stay empty/optional may still be yellow)
+    yellow_on_ins = 0
+    for ins in tree.findall(f'.//{w}ins'):
+        for hl in ins.findall(f'.//{w}highlight'):
+            if hl.get(f'{w}val') == 'yellow':
+                yellow_on_ins += 1
+    print(f"  yellow highlight remaining on <w:ins> runs: {yellow_on_ins}")
+    if yellow_on_ins == 0:
+        print("  [OK] no yellow highlight left on inserted (new) text")
+    else:
+        print("  [WARN] yellow highlight still on some insertions")
+
     if mode == 'track_changes':
-        w = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
         n_del = len(tree.findall(f'.//{w}del'))
         n_ins = len(tree.findall(f'.//{w}ins'))
         n_delText = len(tree.findall(f'.//{w}delText'))
@@ -113,6 +144,14 @@ def verify(path, mode, ref_fields, proj_fields, derived_or_defaulted):
             print(f"  [OK] tracked-change count matches filled anchors ({expected_fills})")
         else:
             print(f"  [WARN] tracked-change count {n_del}/{n_ins} vs expected fills {expected_fills}")
+
+        # settings.xml must enable Track Changes so Word shows Review UI
+        with zipfile.ZipFile(path) as z:
+            settings = etree.fromstring(z.read('word/settings.xml'))
+        if settings.find(f'{w}trackRevisions') is not None:
+            print("  [OK] word/settings.xml has <w:trackRevisions/>")
+        else:
+            print("  [WARN] <w:trackRevisions/> missing from settings.xml")
 
 
 if __name__ == '__main__':

@@ -146,12 +146,36 @@ class HighlightHelpersTest(unittest.TestCase):
 
             with zipfile.ZipFile(out) as z:
                 root = etree.fromstring(z.read('word/document.xml'))
+                settings = etree.fromstring(z.read('word/settings.xml'))
             self.assertEqual(len(root.findall(f'.//{W}del')), 1)
             self.assertEqual(len(root.findall(f'.//{W}ins')), 1)
             del_text = root.find(f'.//{W}delText').text
             ins_text = root.find(f'.//{W}ins//{W}t').text
             self.assertEqual(del_text, '---')
             self.assertEqual(ins_text, 'الرياض')
+            self.assertIsNotNone(settings.find(f'{W}trackRevisions'))
+
+    def test_date_h_renders_arabic_by_default(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = os.path.join(tmp, 'src.docx')
+            out = os.path.join(tmp, 'out.docx')
+            _make_docx_with_highlighted_cell(src)
+            fields = {
+                'deed_date_h': {
+                    'label': 'تاريخ الصك',
+                    'type': 'date_h',
+                    'anchors': [{'t': 1, 'r': 1, 'c': 1}],
+                },
+            }
+            fill_highlighted_template(
+                src, out, fields, {'deed_date_h': '1447-07-26'},
+                mode='direct',
+            )
+            with zipfile.ZipFile(out) as z:
+                root = etree.fromstring(z.read('word/document.xml'))
+            text = ''.join(t.text or '' for t in root.iter(f'{W}t'))
+            self.assertIn('رجب', text)
+            self.assertIn('هـ', text)
 
 
 if __name__ == '__main__':

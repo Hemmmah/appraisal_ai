@@ -65,6 +65,9 @@ structure and formatting are otherwise untouched. See
   place in the report).
 - `type`: `text` | `number` | `date_g` | `date_h` | `derived`. `number` values
   are formatted per `_meta.number_format` (`comma`, `comma2`, `plain`).
+- `date_h` + `render_style` (optional): default `"arabic"` renders
+  Arabic-Indic digits + month name (`٥ رجب ١٤٤٧هـ` via
+  `utils.format_hijri_arabic`). Set `"iso"` to keep `YYYY-MM-DD`.
 - `default_from`: fall back to another field's *resolved* value if this one
   isn't provided (e.g. `owner_name` defaults to `client_name`).
 - `derive_hijri_from`: auto-derive a Hijri value from another field's
@@ -120,8 +123,10 @@ for w in report['warnings']:
 - **`track_changes`** (default/recommended): old highlighted text becomes a
   tracked deletion (`w:del`/`w:delText`, highlight preserved — a rejected
   change reverts to the original template state), new value becomes a
-  tracked insertion (`w:ins`, highlight stripped). Opens in Word's Review
-  pane; the appraiser accepts/rejects field by field.
+  tracked insertion (`w:ins`, highlight stripped). The engine also injects
+  `<w:trackRevisions/>` into `word/settings.xml` so Word opens the draft
+  with Track Changes already on. Opens in Word's Review pane; the
+  appraiser accepts/rejects field by field.
 - **`direct`**: overwrites text in place, strips highlight from filled
   fields. Clean output, no review step — best once the field map is trusted.
 

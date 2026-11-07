@@ -60,9 +60,24 @@ def style_run(run, size=11, bold=False, highlight=False):
     if rFonts is None:
         rFonts = rPr.makeelement(qn('w:rFonts'), {})
         rPr.append(rFonts)
+    rFonts.set(qn('w:ascii'), FONT)
+    rFonts.set(qn('w:hAnsi'), FONT)
     rFonts.set(qn('w:cs'), FONT)
-    rtl = rPr.makeelement(qn('w:rtl'), {})
-    rPr.append(rtl)
+    # Mark complex-script / RTL so Word keeps Arabic shaping after fill
+    if rPr.find(qn('w:rtl')) is None:
+        rPr.append(rPr.makeelement(qn('w:rtl'), {}))
+    if rPr.find(qn('w:cs')) is None:
+        rPr.append(rPr.makeelement(qn('w:cs'), {}))
+    lang = rPr.find(qn('w:lang'))
+    if lang is None:
+        lang = rPr.makeelement(qn('w:lang'), {
+            qn('w:val'): 'ar-SA',
+            qn('w:bidi'): 'ar-SA',
+        })
+        rPr.append(lang)
+    else:
+        lang.set(qn('w:val'), 'ar-SA')
+        lang.set(qn('w:bidi'), 'ar-SA')
     if highlight:
         run.font.highlight_color = WD_COLOR_INDEX.YELLOW
     return run

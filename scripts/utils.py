@@ -953,7 +953,7 @@ def insert_paragraphs_after(body, anchor_para, new_paragraphs):
 # Some templates (e.g. dense Arabic tables with repeated literal values like
 # "-", "20", "1000") cannot be safely matched by the literal-text diff engine
 # above, because identical old-text strings map to different semantic fields.
-# For these packs, `reference-data.yaml` sets `anchor_mode: highlight` and
+# For these packs, `reference-data.json` sets `anchor_mode: highlight` and
 # each field carries `anchors: [{t, r, c}, ...]` — 1-based table/row/cell
 # coordinates, numbered by document order (DFS into nested tables) — instead
 # of (or in addition to) a literal old value. Replacement targets the
@@ -1221,7 +1221,14 @@ def fill_highlighted_template(template_path, output_path, fields, data,
                 skipped.append(f"{key} ({spec.get('label', key)})")
             continue
         raw = vals[key]
-        v = fmt_number(raw, number_format) if spec.get('type') == 'number' else raw
+        if spec.get('type') == 'number':
+            v = fmt_number(raw, number_format)
+        elif spec.get('type') == 'date_h' and spec.get('render_style', 'arabic') == 'arabic':
+            # Default: Arabic-Indic + month name (٥ رجب ١٤٤٧هـ). Use
+            # render_style: "iso" in the field spec for YYYY-MM-DD instead.
+            v = format_hijri_arabic(raw)
+        else:
+            v = raw
         for a in spec.get('anchors', []):
             if a.get('scope') == 'letter':
                 target = None
@@ -1267,9 +1274,30 @@ def fill_highlighted_template(template_path, output_path, fields, data,
             for item in zin.infolist():
                 if item.filename == 'word/document.xml':
                     zout.writestr(item, new_xml)
+                elif (item.filename == 'word/settings.xml'
+                      and mode == 'track_changes'):
+                    # Ensure Word opens the draft in Review mode with
+                    # Track Changes already on — otherwise del/ins markup
+                    # is present but easy to miss.
+                    settings_xml = enable_track_revisions_xml(zin.read(item.filename))
+                    zout.writestr(item, settings_xml)
                 else:
                     zout.writestr(item, zin.read(item.filename))
     shutil.move(temp_docx, output_path)
     shutil.rmtree(temp_dir, ignore_errors=True)
 
     return {'filled': filled, 'skipped': skipped, 'missing': missing, 'warnings': warnings}
+
+
+def enable_track_revisions_xml(settings_bytes):
+    """Inject <w:trackRevisions/> into word/settings.xml if missing."""
+    root = etree.fromstring(settings_bytes)
+    if root.find(f'{W}trackRevisions') is None:
+        el = etree.Element(f'{W}trackRevisions')
+        # Insert near the top of w:settings for maximum Word compatibility
+        root.insert(0, el)
+    out = etree.tostring(root, xml_declaration=True, encoding='UTF-8', standalone=True)
+    return out.replace(
+        b"<?xml version='1.0' encoding='UTF-8' standalone='yes'?>",
+        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    )
